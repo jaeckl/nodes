@@ -3,6 +3,7 @@ package main
 import (
     "github.com/jaeckl/nodes/core"
     "github.com/jaeckl/nodes/api"
+    "github.com/jaeckl/nodes/pack"
     "fmt"
     "strconv"
 )
@@ -23,11 +24,8 @@ func main() {
     rt.ConnectMsg("math.adder:1","lang.value:2")
 
     rt.ReceiveMessage("math.adder:1","Pulse")
+    pack.Load("core.npk")
 }
-
-
-
-
 
 type NumberObject struct {
     data int
@@ -61,6 +59,7 @@ func NewAdder() api.NodeObject {
     object := &AdderObject{}
     return object
 }
+
 func (ad *AdderObject) Init(ctx api.RuntimeContext,args string) {
     ctx.NewInputNode("a1","int")
     ctx.NewInputNode("a2","int")

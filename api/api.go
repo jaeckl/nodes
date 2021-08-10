@@ -29,6 +29,5 @@ type RuntimeAPI interface {
     Connect(from string,outname string, to string, inname string)
     SendMessage(id string,msg string)
     ReceiveMessage(id string,msg string)
-    BreadCast(msg string)
 }
 

@@ -36,7 +36,7 @@ func (rt *Runtime) New(id string, objectname string,args string) {
             MsgReceivers:   make([]*ObjectData,0),
         }
 
-        datamodel.Object.Init(&RuntimeContextImpl{runtime:rt,scope:datamodel},args)
+        datamodel.Object.Init(&RuntimeContextImpl{Runtime:rt,scope:datamodel},args)
 
         rt.memoryModel[id] = datamodel
     } else {
@@ -53,13 +53,13 @@ func (rt *Runtime) Delete(id string) {
 func (rt *Runtime) SendMessage(id string,msg string) {
     if val, ok := rt.memoryModel[id]; ok {
         for _,receiver := range val.MsgReceivers {
-        receiver.Object.ReceiveMessage(&RuntimeContextImpl{runtime:rt,scope:receiver },msg)
+        receiver.Object.ReceiveMessage(&RuntimeContextImpl{Runtime:rt,scope:receiver },msg)
     }
     }
 }
 func (rt *Runtime) ReceiveMessage(id string,msg string) {
     if val, ok := rt.memoryModel[id]; ok {
-        val.Object.ReceiveMessage(&RuntimeContextImpl{runtime:rt,scope:val},msg)
+        val.Object.ReceiveMessage(&RuntimeContextImpl{Runtime:rt,scope:val},msg)
     }
 }
 
@@ -184,11 +184,11 @@ func (od *ObjectData) Output(nodeName string) api.OutputNode {
 
 
 type RuntimeContextImpl struct {
-    runtime *Runtime
+    *Runtime
     scope *ObjectData
 }
 func NewRuntimeContext(runtime *Runtime,scope *ObjectData) *RuntimeContextImpl {
-    return &RuntimeContextImpl{runtime:runtime,scope:scope}
+    return &RuntimeContextImpl{Runtime:runtime,scope:scope}
 }
 func (ctx *RuntimeContextImpl) NewInputNode(nodename string,typename TypeString) {
     ctx.scope.Inputs = append(ctx.scope.Inputs,&Node{Name:nodename,Data:nil,Type:typename,Connection:make([]*Node,1),Object:ctx.scope.Object})
@@ -207,6 +207,6 @@ func (ctx *RuntimeContextImpl) Outputs(nodeName string) api.OutputNode {
 
 func (ctx *RuntimeContextImpl) Broadcast(msg string) {
     for _,receiver := range ctx.scope.MsgReceivers {
-        receiver.Object.ReceiveMessage(&RuntimeContextImpl{runtime:ctx.runtime,scope:receiver },msg)
+        receiver.Object.ReceiveMessage(&RuntimeContextImpl{Runtime:ctx.Runtime,scope:receiver },msg)
     }
 }
