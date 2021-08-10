@@ -1,8 +1,8 @@
 package main
 
 import (
-    "godspnodes/core"
-    "godspnodes/api"
+    "github.com/jaeckl/nodes/core"
+    "github.com/jaeckl/nodes/api"
     "fmt"
     "strconv"
 )

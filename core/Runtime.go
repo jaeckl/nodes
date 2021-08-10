@@ -1,5 +1,5 @@
 package core
-import "godspnodes/api"
+import "github.com/jaeckl/nodes/api"
 import "fmt"
 
 type ObjectName = string
