@@ -1,3 +1,3 @@
-module github.com/jaeckl/nodes v1.0
+module github.com/jaeckl/nodes
 
 go 1.13

@@ -1,7 +1,7 @@
 package core
 import "github.com/jaeckl/nodes/api"
 import "fmt"
-
+import "log"
 type ObjectName = string
 type NodeName = string
 
@@ -22,6 +22,7 @@ func NewRuntime() *Runtime {
 
 func (rt *Runtime) RegisterObject(objectname string,constructor func() api.NodeObject){
     rt.classRegistry[objectname] = constructor
+    log.Printf("Registered %v successfull\n",objectname)
 }
 
 
@@ -35,17 +36,18 @@ func (rt *Runtime) New(id string, objectname string,args string) {
             Outputs:        make([]*Node,0),
             MsgReceivers:   make([]*ObjectData,0),
         }
-
         datamodel.Object.Init(&RuntimeContextImpl{Runtime:rt,scope:datamodel},args)
 
         rt.memoryModel[id] = datamodel
+        log.Printf("Created new object of type %v successfull\n",objectname)
     } else {
-        // LOG Object does not exists.
+        log.Printf("Error: Oject of type %v not registered\n",objectname)
     }
 }
 
 func (rt *Runtime) Delete(id string) {
     delete(rt.memoryModel,id)
+    log.Printf("Removed oject with id %v\n",id)
 }
 
 /**************************** Object Messaging ****************************/
@@ -68,12 +70,12 @@ func (rt *Runtime) ReceiveMessage(id string,msg string) {
 func (rt *Runtime) Connect(objectFrom string,nodeFrom string, objectTo string, nodeTo string){
     ObjectFrom,ok := rt.memoryModel[objectFrom]
     if !ok {
-        fmt.Println("Sending Object does not exists")
+        log.Printf("Error: Requested sender %v does not exist%v\n",objectFrom)
         return
     }
     ObjectTo,ok := rt.memoryModel[objectTo]
     if !ok {
-        fmt.Println("Receiving Object does not exists")
+        log.Printf("Error: Requested receiver %v does not exist%v\n",objectFrom)
         return
     }
     var NodeFrom *Node
@@ -82,6 +84,10 @@ func (rt *Runtime) Connect(objectFrom string,nodeFrom string, objectTo string, n
             NodeFrom = node
         }
     }
+    if NodeFrom == nil {
+        log.Printf("Error: Requested sender %v has no node named %v\n",objectFrom,nodeFrom)
+        return
+    }
 
     var NodeTo *Node
     for _,node := range ObjectTo.Inputs {
@@ -89,9 +95,17 @@ func (rt *Runtime) Connect(objectFrom string,nodeFrom string, objectTo string, n
             NodeTo = node
         }
     }
-
+    if NodeTo == nil {
+        log.Printf("Error: Requested receiver %v has no node named %v\n",objectTo,nodeTo)
+        return
+    }
+    if NodeFrom.Type != NodeTo.Type {
+        log.Printf("Error: Type of %v is %v but type of %v is %v\n",nodeFrom,NodeFrom.Type,nodeTo,NodeTo.Type)
+        return
+    }
     NodeFrom.Connection = append(NodeFrom.Connection,NodeTo)
     NodeTo.Connection[0] = NodeFrom
+    log.Printf("Connecting %v:%v to %v:%v successfull\n",objectFrom,nodeFrom,objectTo,nodeTo)
 }
 
 func (rt *Runtime) ConnectMsg(objectFrom string,objectTo string) {
