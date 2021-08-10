@@ -18,7 +18,7 @@ type RuntimeContext interface {
 }
 
 type NodeObject interface {
-    Init(ctx RuntimeContext,args string)
+    Init(ctx RuntimeContext,args string) bool
     ReceiveMessage(ctx RuntimeContext,msg string)
 }
 

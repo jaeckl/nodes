@@ -11,16 +11,17 @@ func New() api.NodeObject {
     object := &AdderObject{}
     return object
 }
-func (ad *AdderObject) Init(ctx api.RuntimeContext,args string) {
-    ctx.NewInputNode("a1","int")
-    ctx.NewInputNode("a2","int")
-    ctx.NewOutputNode("a1","int")
+func (ad *AdderObject) Init(ctx api.RuntimeContext,args string) bool {
+    ctx.NewInputNode("left","int")
+    ctx.NewInputNode("right","int")
+    ctx.NewOutputNode("out","int")
+    return true
 }
 
 func (ad *AdderObject) ReceiveMessage(ctx api.RuntimeContext,msg string) {
     fmt.Printf("Receiving Message: %v\n",msg)
-    val := ctx.Inputs("a1").GetValue().(int) + ctx.Inputs("a2").GetValue().(int)
-    ctx.Outputs("a1").SetValue(val)
+
+    val := ctx.Inputs("left").GetValue().(int64) + ctx.Inputs("right").GetValue().(int64)
+    ctx.Outputs("out").SetValue(val)
     ctx.Broadcast("Pulse")
-    fmt.Println(val)
 }

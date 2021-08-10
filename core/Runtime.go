@@ -15,7 +15,6 @@ func NewRuntime() *Runtime {
     return &Runtime{
                 classRegistry:  make(map[string] func() api.NodeObject),
                 memoryModel:    make(map[string] *ObjectData),
-
     }
 }
 /**************************** Object Registry ****************************/
@@ -36,8 +35,11 @@ func (rt *Runtime) New(id string, objectname string,args string) {
             Outputs:        make([]*Node,0),
             MsgReceivers:   make([]*ObjectData,0),
         }
-        datamodel.Object.Init(&RuntimeContextImpl{Runtime:rt,scope:datamodel},args)
-
+        succ := datamodel.Object.Init(&RuntimeContextImpl{Runtime:rt,scope:datamodel},args)
+        if !succ {
+            log.Printf("Error: Bad arguments\n")
+            return
+        }
         rt.memoryModel[id] = datamodel
         log.Printf("Created new object of type %v successfull\n",objectname)
     } else {
